@@ -223,6 +223,7 @@ module Toto
 
     def initialize obj, config = {}
       @obj, @config = obj, config
+      @loaded = false
       self.load if obj.is_a? Hash
     end
 
@@ -237,14 +238,14 @@ module Toto
         @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
 
-      self.taint
+      @loaded = true
       self.update data
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
       self
     end
 
     def [] key
-      self.load unless self.tainted?
+      self.load unless @loaded
       super
     end
 
